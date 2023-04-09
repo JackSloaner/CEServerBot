@@ -1,18 +1,29 @@
 import os
+from replit import db
 
+from functions import *
 import discord
+from discord.ext import commands
 
-intents = discord.Intents.default()
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 
-
-@client.event
+@bot.event
 async def on_ready():
-  ch1 = client.get_channel(1087087110290419884)
-  f = open('rules.txt')
-  await ch1.send(f.read())
+  print("ready")
 
+@bot.event
+async def on_message(message):
+  if message.author == bot.user:
+    return
+  if (not discord.utils.get(message.author.roles, name="Moderator")) and (not message.author.guild_permissions.administrator):
+    return
+  curChannel = message.channel
+
+#Moderator commands
+  
+  if message.content.startswith('$roleMenu'):
+    await roleMenu(message)
 
 TOKEN = os.environ['TOKEN']
 
-client.run(TOKEN)
+bot.run(TOKEN)
