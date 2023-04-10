@@ -17,7 +17,6 @@ async def on_message(message):
     return
   if (not discord.utils.get(message.author.roles, name="Moderator")) and (not message.author.guild_permissions.administrator):
     return
-  curChannel = message.channel
 
 #Moderator commands
   
