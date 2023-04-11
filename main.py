@@ -11,7 +11,6 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 @bot.event
 async def on_ready():
   print("ready")
-  print(db["reactions"])
 
 
 @bot.event

@@ -113,6 +113,9 @@ def getAllConfigs(string):
   numberConfigs = getAllNumberConfigs(len(dashPos))
   stringConfigs = []
   for numConfig in numberConfigs:
+    if not dashPos:
+        config = string
+        break
     config = string[0:dashPos[0]]
     i = 0
     for dash in dashPos:
