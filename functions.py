@@ -4,6 +4,16 @@ import os
 from discord.ext import commands
 from replit import db
 
+def getPayloadInfo(guild, payload, channelName):
+  user = discord.utils.get(guild.members, id=payload.user_id)
+  channels = guild.channels
+  channel = discord.utils.get(channels, id=payload.channel_id)
+  soughtChannel = discord.utils.get(channels, name=channelName)
+  payloadInfo = {"user":user, "channel":channel}
+  if channel == soughtChannel:
+    return payloadInfo
+  return 0
+
 def nextConfig(lastConfig):
   reverse = lastConfig.copy()
   reverse.reverse()
