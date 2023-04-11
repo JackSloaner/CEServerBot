@@ -25,7 +25,7 @@ async def on_message(message):
 
 #Moderator commands
 
-  if message.content.startswith('$roleMenu'):
+  if message.content.startswith('$roleMenu') and message.channel.name == "roles":
     await roleMenu(message)
 
   if message.content.startswith('$clearChannel'):
