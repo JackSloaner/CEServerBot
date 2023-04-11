@@ -129,7 +129,9 @@ def getAllConfigs(string):
   return stringConfigs
 
 async def roleMenu(message):
-  args = message.content.strip().split(" ")
+  args = message.content.split(" ")
+  for x in args:
+    x.strip(" ")
   menuType = args[1]
   args = args[2:]
   msg = '**Role menu: {}**\n ‎\n'.format(menuType)
