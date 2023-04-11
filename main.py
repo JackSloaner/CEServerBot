@@ -64,7 +64,7 @@ async def on_raw_reaction_add(payload):
   reactionList = db["reactions"]
 
   for x in reactionList:
-    reactedMessage = await payloadInfo["message"]
+    reactedMessage = payloadInfo["message"]
     message = await payloadInfo["channel"].fetch_message(x[3])
     reactionEmoji = str(payload.emoji)
     if x[1] == reactionEmoji and message == reactedMessage:
@@ -87,7 +87,7 @@ async def on_raw_reaction_remove(payload):
   for x in reactionList:
     message = await payloadInfo["channel"].fetch_message(x[3])
     reactionEmoji = str(payload.emoji)
-    reactedMessage = await payloadInfo["message"]
+    reactedMessage = payloadInfo["message"]
 
     if x[1] == reactionEmoji and message == reactedMessage:
       await payloadInfo["user"].remove_roles(

@@ -1,7 +1,7 @@
 Other-School|📚
 UofT-other|<:UofT:1088954364812599387>
 UofT-CS|💻
-UofT-Eng(other)|👷
+UofT-Eng-(other)|👷
 UofT-ECE|🖥️
 Year-2-4|👴
 Class-of-28'|<:28:1089646083354935338>
