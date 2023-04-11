@@ -125,12 +125,17 @@ async def roleMenu(message):
     for pair in rawPairs:
       emojiPair = pair.strip(" ").split("|")
       emojis[emojiPair[0]] = emojiPair[1]
+  reactions = []
   for role in usedRoles:
     if role[0] in emojis:
       curEmoji = emojis[role[0]]
     else:
       curEmoji = ' ‎ '
     msg += '{}: `{}`\n ‎ \n'.format(curEmoji, role[1].name)
+    reactions.append([role[1].name, curEmoji, role[1].id])
   botMessage = await message.channel.send(msg)
+  for x in reactions:
+    x.append(botMessage.id)
+    db["reactions"].append(x)
   await message.delete()
 
