@@ -13,10 +13,10 @@ async def on_ready():
   print("ready")
   print(db["reactions"])
 
+
 @bot.event
 async def on_message(message):
 
-  
   if message.author == bot.user:
     return
   if (not discord.utils.get(message.author.roles, name="Moderator")) and (
@@ -26,7 +26,8 @@ async def on_message(message):
 
 #Moderator commands
 
-  if message.content.startswith('$roleMenu') and message.channel.name == "roles":
+  if message.content.startswith(
+      '$roleMenu') and message.channel.name == "roles":
     await roleMenu(message)
 
   if message.content.startswith('$clearChannel'):
@@ -42,54 +43,63 @@ async def on_message(message):
       await logChannel.send("`{}` has cleared the `#{}` channel".format(
         Author, curChannel))
 
+
 @bot.event
 async def on_raw_reaction_add(payload):
-  payloadInfo = await getPayloadInfo(bot.get_guild(payload.guild_id), payload, "roles")
+  payloadInfo = await getPayloadInfo(bot.get_guild(payload.guild_id), payload,
+                                     "roles")
   if not payloadInfo:
     return
   reactionList = db["reactions"]
-       
+
   for x in reactionList:
-    reactedMessage = await payloadInfo["channel"].fetch_message(payload.message_id)
+    reactedMessage = await payloadInfo["message"]
     message = await payloadInfo["channel"].fetch_message(x[3])
     reactionEmoji = str(payload.emoji)
     if x[1] == reactionEmoji and message == reactedMessage:
-      await payloadInfo["user"].add_roles(discord.utils.get(message.guild.roles, name=x[0]))
+      await payloadInfo["user"].add_roles(
+        discord.utils.get(message.guild.roles, name=x[0]))
+
 
 TOKEN = os.environ['TOKEN']
 
+
 @bot.event
 async def on_raw_reaction_remove(payload):
-  payloadInfo = await getPayloadInfo(bot.get_guild(payload.guild_id), payload, "roles")
+  payloadInfo = await getPayloadInfo(bot.get_guild(payload.guild_id), payload,
+                                     "roles")
   if not payloadInfo:
     return
-    
+
   reactionList = db["reactions"]
-  
+
   for x in reactionList:
     message = await payloadInfo["channel"].fetch_message(x[3])
     reactionEmoji = str(payload.emoji)
-    reactedMessage = await payloadInfo["channel"].fetch_message(payload.message_id)
-    
+    reactedMessage = await payloadInfo["message"]
+
     if x[1] == reactionEmoji and message == reactedMessage:
-      await payloadInfo["user"].remove_roles(discord.utils.get(message.guild.roles, name=x[0]))
+      await payloadInfo["user"].remove_roles(
+        discord.utils.get(message.guild.roles, name=x[0]))
+
 
 @bot.event
-async def on_raw_message_delete(payload): 
-  payloadInfo = getPayloadInfo(bot.get_guild(payload.guild_id), payload, "roles")
+async def on_raw_message_delete(payload):
+  payloadInfo = await getPayloadInfo(bot.get_guild(payload.guild_id), payload,
+                                     "roles")
   if not payloadInfo:
     return
   
-  if message.author == bot.user:
-    reactionList = db["reactions"]
-    i = 0
-    indexList = []
-    for x in reactionList:
-      if id == x[3]:
-        indexList.append(i)
-      i += 1
-    indexList.reverse()
-    for i in indexList:
-      db["reactions"].pop(i)
-      
+  reactionList = db["reactions"]
+  i = 0
+  indexList = []
+  for x in reactionList:
+    if payload.message_id == x[3]:
+      indexList.append(i)
+    i += 1
+  indexList.reverse()
+  for i in indexList:
+    db["reactions"].pop(i)
+
+
 bot.run(TOKEN)

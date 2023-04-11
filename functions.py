@@ -5,14 +5,25 @@ from discord.ext import commands
 from replit import db
 
 async def getPayloadInfo(guild, payload, channelName):
-  user = discord.utils.get(guild.members, id=payload.user_id)
+  if isinstance(payload, discord.RawReactionActionEvent
+):  
+    user = discord.utils.get(guild.members, id=payload.user_id)
+  else:
+    user = 0
   channels = guild.channels
   channel = discord.utils.get(channels, id=payload.channel_id)
-  async for x in channel.history(limit=200):
-    if x.id == payload.message_id:
+  message = 0
+  if isinstance(payload, discord.RawReactionActionEvent
+):
+    async for x in channel.history(limit=200):
       message = x
   soughtChannel = discord.utils.get(channels, name=channelName)
-  payloadInfo = {"user":user, "channel":channel, "message": message}
+  payloadInfo = {"channel":channel}
+  if user:
+    payloadInfo["user"] = user
+  if message:
+    payloadInfo["message"] = message
+  
   if channel == soughtChannel:
     return payloadInfo
   return 0
