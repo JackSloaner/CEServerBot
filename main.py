@@ -44,7 +44,7 @@ async def on_message(message):
 
 @bot.event
 async def on_raw_reaction_add(payload):
-  payloadInfo = getPayloadInfo(bot.get_guild(payload.guild_id), payload, "roles")
+  payloadInfo = await getPayloadInfo(bot.get_guild(payload.guild_id), payload, "roles")
   if not payloadInfo:
     return
   reactionList = db["reactions"]
@@ -60,7 +60,7 @@ TOKEN = os.environ['TOKEN']
 
 @bot.event
 async def on_raw_reaction_remove(payload):
-  payloadInfo = getPayloadInfo(bot.get_guild(payload.guild_id), payload, "roles")
+  payloadInfo = await getPayloadInfo(bot.get_guild(payload.guild_id), payload, "roles")
   if not payloadInfo:
     return
     
@@ -73,5 +73,23 @@ async def on_raw_reaction_remove(payload):
     
     if x[1] == reactionEmoji and message == reactedMessage:
       await payloadInfo["user"].remove_roles(discord.utils.get(message.guild.roles, name=x[0]))
+
+@bot.event
+async def on_raw_message_delete(payload): 
+  payloadInfo = getPayloadInfo(bot.get_guild(payload.guild_id), payload, "roles")
+  if not payloadInfo:
+    return
+  
+  if message.author == bot.user:
+    reactionList = db["reactions"]
+    i = 0
+    indexList = []
+    for x in reactionList:
+      if id == x[3]:
+        indexList.append(i)
+      i += 1
+    indexList.reverse()
+    for i in indexList:
+      db["reactions"].pop(i)
       
 bot.run(TOKEN)

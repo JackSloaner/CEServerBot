@@ -4,15 +4,19 @@ import os
 from discord.ext import commands
 from replit import db
 
-def getPayloadInfo(guild, payload, channelName):
+async def getPayloadInfo(guild, payload, channelName):
   user = discord.utils.get(guild.members, id=payload.user_id)
   channels = guild.channels
   channel = discord.utils.get(channels, id=payload.channel_id)
+  async for x in channel.history(limit=200):
+    if x.id == payload.message_id:
+      message = x
   soughtChannel = discord.utils.get(channels, name=channelName)
-  payloadInfo = {"user":user, "channel":channel}
+  payloadInfo = {"user":user, "channel":channel, "message": message}
   if channel == soughtChannel:
     return payloadInfo
   return 0
+
 
 def nextConfig(lastConfig):
   reverse = lastConfig.copy()
