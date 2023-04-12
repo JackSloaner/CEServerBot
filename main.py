@@ -11,6 +11,7 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 @bot.event
 async def on_ready():
   print("ready")
+  print(db["reactions"])
 
 
 @bot.event
@@ -62,9 +63,10 @@ async def on_raw_reaction_add(payload):
   if not payloadInfo:
     return
   reactionList = db["reactions"]
-
+  print("test")
   for x in reactionList:
     reactedMessage = payloadInfo["message"]
+    print(reactedMessage.content[:15])
     message = await payloadInfo["channel"].fetch_message(x[3])
     reactionEmoji = str(payload.emoji)
     if x[1] == reactionEmoji and message == reactedMessage:

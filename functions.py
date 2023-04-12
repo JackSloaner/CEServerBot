@@ -16,7 +16,8 @@ async def getPayloadInfo(guild, payload, channelName):
   if isinstance(payload, discord.RawReactionActionEvent
 ):
     async for x in channel.history(limit=200):
-      message = x
+      if x.id == payload.message_id:
+        message = x
   soughtChannel = discord.utils.get(channels, name=channelName)
   payloadInfo = {"channel":channel}
   if user:
