@@ -24,12 +24,12 @@ async def on_ready():
   guild = bot.get_guild(int(ID))
   webhook = discord.utils.get(await guild.webhooks(), id=db["webhook"])
   
-  async def runLatestStory():
+  async def updateNews():
     while True:
-      await sendLatestStory(webhook)
+      await updateNewsChannel(webhook)
       await asyncio.sleep(60)
     
-  bot.loop.create_task(runLatestStory())
+  bot.loop.create_task(updateNews())
 
 @bot.event
 async def on_message(message):
