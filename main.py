@@ -27,8 +27,8 @@ async def on_ready():
                               {'class': 'pane-latest-news'})[1].find('a')
 
   domain = "https://www.utoronto.ca"
-  
-  await webhook.send(domain + latestStory["href"])
+  embed = createEmbed(latestStory, domain)
+  await webhook.send(embed=embed)
 
 
 @bot.event

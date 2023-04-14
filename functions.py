@@ -1,5 +1,11 @@
 import sys
 import discord
+from discord.embeds import Embed
+from bs4 import BeautifulSoup
+import requests
+
+from datetime import datetime
+import pytz
 import os
 from discord.ext import commands
 from replit import db
@@ -170,3 +176,20 @@ async def roleMenu(message):
     db["reactions"].append(x)
   await message.delete()
 
+def createEmbed(link, domain):
+  domain = "https://www.utoronto.ca"
+  hyperLink = domain + link["href"]
+  response = requests.get(hyperLink)
+  soup = BeautifulSoup(response.content, 'html.parser')
+  firstParagraph = soup.find('div', {'class': 'story-content'}).find_all('p')[1].get_text()
+  embed = Embed(title= link["aria-label"], url = hyperLink, description= firstParagraph + "..",  colour = 0x0563f8)
+  embed.set_author(name="University of Toronto News")
+  image = (link.find('img')['src'])
+  embed.set_image(url=image)
+  timezone = pytz.timezone('America/Toronto')
+  now = datetime.now(timezone)
+  hour = now.strftime("%I").strip("0")
+  date_time = now.strftime("%m/%d/%Y • {}:%M %p".format(hour))
+  embed.set_footer(text= date_time)
+
+  return embed
