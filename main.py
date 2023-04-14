@@ -1,9 +1,13 @@
 import os
 from replit import db
 
+import requests
+from bs4 import BeautifulSoup
 from functions import *
 import discord
 from discord.ext import commands
+from discord import Webhook
+from discord.embeds import Embed
 
 bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 
@@ -11,13 +15,28 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 @bot.event
 async def on_ready():
   print("ready")
-  print(db["reactions"])
+  ID = os.environ["SERVER_ID"]
+  guild = bot.get_guild(int(ID))
+
+  webhook = discord.utils.get(await guild.webhooks(), id=db["webhook"])
+
+  response = requests.get("https://utoronto.ca/news")
+  soup = BeautifulSoup(response.content, 'html.parser')
+
+  latestStory = soup.find_all('div',
+                              {'class': 'pane-latest-news'})[1].find('a')
+
+  domain = "https://www.utoronto.ca"
+  
+  await webhook.send(domain + latestStory["href"])
 
 
 @bot.event
 async def on_message(message):
 
   if message.author == bot.user:
+    return
+  if isinstance(message.author, discord.User):
     return
 
 #User commands
