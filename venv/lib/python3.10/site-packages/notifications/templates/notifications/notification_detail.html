@@ -1,0 +1,34 @@
+{% if notification.pk %}
+  <div class="notification-body{% if not notification.read %} unread{% endif %}">
+    {% if notification.sender.icon %}
+      <div class="notification-icon">
+        <img src="{{ notification.sender.icon }}"
+      </div>
+    {% endif %}
+
+    <div class="notification-text">
+      {{ notification.text|safe|linebreaks }}
+
+      {% if notification.sender %}
+        <small>
+          {% if notification.sender.url %}<a href="{{ notification.sender.url }}" target="_blank">{% endif %}
+            {{ notification.sender }}
+          {% if notification.sender.url %}</a>{% endif %}
+        </small>
+      {% endif %}
+
+      {% for action in notification.actions.all %}
+        <a class="btn btn-{{ action.kind }} btn-outline btn-sm" href="{{ action.url }}">{{ action.text }}</a>
+      {% endfor %}
+    </div>
+
+    <div class="notification-actions">
+      <a class="notification-close text-muted" href="{% url 'user_notification' notification.pk %}?action=delete" title="Remove notification" data-toggle="tooltip">
+        <i class="fa fa-trash"></i>
+      </a>
+      <a class="notification-read text-danger" href="{% url 'user_notification' notification.pk %}?action=read" title="Mark notification as read" data-toggle="tooltip">
+        <i class="fa fa-eye"></i>
+      </a>
+    </div>
+  </div>
+{% endif %}

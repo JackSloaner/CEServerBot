@@ -193,3 +193,16 @@ def createEmbed(link, domain):
   embed.set_footer(text= date_time)
 
   return embed
+
+async def sendLatestStory(webhook):
+
+  response = requests.get("https://utoronto.ca/news")
+  soup = BeautifulSoup(response.content, 'html.parser')
+
+  latestStory = soup.find_all('div',
+                              {'class': 'pane-latest-news'})[1].find('a')
+
+  domain = "https://www.utoronto.ca"
+  embed = createEmbed(latestStory, domain)
+  await webhook.send(embed=embed)
+  return

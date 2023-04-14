@@ -1,0 +1,14 @@
+{{ user.first_name|default:user.username }}, here are the notifications you've missed:
+
+{% for notification in messages %}
+  <li>
+    {{ notification.text|safe }}
+    {% if notification.actions.exists %}
+      <ul>
+        {% for action in notification.actions.all %}
+          <li><a href="{{ action.url }}">{{ action.text }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </li>
+{% endfor %}

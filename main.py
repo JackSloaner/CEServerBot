@@ -9,7 +9,12 @@ from discord.ext import commands
 from discord import Webhook
 from discord.embeds import Embed
 
+import schedule
+
+import asyncio
+
 bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
+
 
 
 @bot.event
@@ -17,19 +22,14 @@ async def on_ready():
   print("ready")
   ID = os.environ["SERVER_ID"]
   guild = bot.get_guild(int(ID))
-
   webhook = discord.utils.get(await guild.webhooks(), id=db["webhook"])
-
-  response = requests.get("https://utoronto.ca/news")
-  soup = BeautifulSoup(response.content, 'html.parser')
-
-  latestStory = soup.find_all('div',
-                              {'class': 'pane-latest-news'})[1].find('a')
-
-  domain = "https://www.utoronto.ca"
-  embed = createEmbed(latestStory, domain)
-  await webhook.send(embed=embed)
-
+  
+  async def runLatestStory():
+    while True:
+      await sendLatestStory(webhook)
+      await asyncio.sleep(60)
+    
+  bot.loop.create_task(runLatestStory())
 
 @bot.event
 async def on_message(message):
@@ -85,7 +85,6 @@ async def on_raw_reaction_add(payload):
   print("test")
   for x in reactionList:
     reactedMessage = payloadInfo["message"]
-    print(reactedMessage.content[:15])
     message = await payloadInfo["channel"].fetch_message(x[3])
     reactionEmoji = str(payload.emoji)
     if x[1] == reactionEmoji and message == reactedMessage:

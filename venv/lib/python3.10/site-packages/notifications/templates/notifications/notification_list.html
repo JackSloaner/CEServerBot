@@ -1,0 +1,31 @@
+{% for notification in request.user.notifications.all|slice:':10' %}
+  <li class="{% if notification.read %}read{% else %}unread{% endif %}" data-id="{{ notification.pk }}">
+    {% include 'notifications/notification_detail.html' %}
+  </li>
+{% empty %}
+  <li style="padding: 7px;">
+    Phew, you don&rsquo;t have any notifications
+  </li>
+{% endfor %}
+
+{% if request.user.notifications.unread.exists %}
+  <li class="divider"></li>
+  <li>
+    <div class="notification-body">
+      <a href="{% url 'user_notifications' %}?action=read" class="notification-bulk-action">
+        <i class="fa fa-check"></i>
+        Mark all as read
+      </a>
+    </div>
+  </li>
+{% elif request.user.notifications.read.exists %}
+  <li class="divider"></li>
+  <li>
+    <div class="notification-body">
+      <a href="{% url 'user_notifications' %}?action=delete" class="notification-bulk-action">
+        <i class="fa fa-trash"></i>
+        Delete all
+      </a>
+    </div>
+  </li>
+{% endif %}
