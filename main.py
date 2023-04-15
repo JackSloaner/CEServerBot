@@ -22,9 +22,9 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 @bot.event
 async def on_ready():
   print("ready")
-  print(db["stories"])
   ID = os.environ["SERVER_ID"]
   guild = bot.get_guild(int(ID))
+  
   webhook = discord.utils.get(await guild.webhooks(), id=db["webhook"])
   
   async def updateNews():
@@ -63,7 +63,18 @@ async def on_message(message):
   if message.content.startswith(
       '$roleMenu') and message.channel.name == "roles":
     await roleMenu(message)
-
+        
+  if message.content.startswith('$suggest'):
+    author = message.author
+    msg = "`{}`: {}".format(author, message.content[8:])
+    suggestionChannel = discord.utils.get(message.guild.channels, name = 'suggestions')
+    await suggestionChannel.send(msg)
+    await message.channel.send("**Your suggestion has been sent to a moderator channel. Thank you for your input!**")
+    logChannel = discord.utils.get(message.guild.text_channels, name="server-logs")
+    serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
+    await logChannel.send("`{}` has used $suggest! Take a peek at #suggestions! {}".format(author, serverOwner.mention))
+    
+  
   if message.content.startswith('$clearChannel'):
     Author = message.author
     curChannel = message.channel
@@ -85,7 +96,6 @@ async def on_raw_reaction_add(payload):
   if not payloadInfo:
     return
   reactionList = db["reactions"]
-  print("test")
   for x in reactionList:
     reactedMessage = payloadInfo["message"]
     message = await payloadInfo["channel"].fetch_message(x[3])

@@ -181,7 +181,7 @@ def createEmbed(link, domain):
   hyperLink = domain + link["href"]
   response = requests.get(hyperLink)
   soup = BeautifulSoup(response.content, 'html.parser')
-  firstParagraph = soup.find('div', {'class': 'story-content'}).find_all('p')[1].get_text()
+  firstParagraph = soup.find('div', {'class': 'story-content'}).find_all('p')[1].get_text().strip(" ")
   embed = Embed(title= link["aria-label"], url = hyperLink, description= firstParagraph + "..",  colour = 0x0563f8)
   embed.set_author(name="University of Toronto News")
   image = (link.find('img')['src'])
