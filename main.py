@@ -52,6 +52,16 @@ async def on_message(message):
     serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
     await logChannel.send("`{}` has used $moderate! Look out for new form submission! {}".format(message.author, serverOwner.mention))
 
+  if message.content.startswith('$suggest'):
+    author = message.author
+    msg = "`{}`: {}".format(author, message.content[8:])
+    suggestionChannel = discord.utils.get(message.guild.channels, name = 'suggestions')
+    await suggestionChannel.send(msg)
+    await message.channel.send("**Your suggestion has been sent to a moderator channel. Thank you for your input!**")
+    logChannel = discord.utils.get(message.guild.text_channels, name="server-logs")
+    serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
+    await logChannel.send("`{}` has used $suggest! Take a peek at #suggestions! {}".format(author, serverOwner.mention))
+
   
   if (not discord.utils.get(message.author.roles, name="Moderator")) and (
       not message.author.guild_permissions.administrator):
@@ -63,16 +73,6 @@ async def on_message(message):
   if message.content.startswith(
       '$roleMenu') and message.channel.name == "roles":
     await roleMenu(message)
-        
-  if message.content.startswith('$suggest'):
-    author = message.author
-    msg = "`{}`: {}".format(author, message.content[8:])
-    suggestionChannel = discord.utils.get(message.guild.channels, name = 'suggestions')
-    await suggestionChannel.send(msg)
-    await message.channel.send("**Your suggestion has been sent to a moderator channel. Thank you for your input!**")
-    logChannel = discord.utils.get(message.guild.text_channels, name="server-logs")
-    serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
-    await logChannel.send("`{}` has used $suggest! Take a peek at #suggestions! {}".format(author, serverOwner.mention))
     
   
   if message.content.startswith('$clearChannel'):
