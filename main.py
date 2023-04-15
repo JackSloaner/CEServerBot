@@ -18,21 +18,21 @@ import asyncio
 bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 
 
-
 @bot.event
 async def on_ready():
   print("ready")
   ID = os.environ["SERVER_ID"]
   guild = bot.get_guild(int(ID))
-  
+
   webhook = discord.utils.get(await guild.webhooks(), id=db["webhook"])
-  
+
   async def updateNews():
     while True:
       await updateNewsChannel(webhook)
       await asyncio.sleep(300)
-    
+
   bot.loop.create_task(updateNews())
+
 
 @bot.event
 async def on_message(message):
@@ -43,26 +43,34 @@ async def on_message(message):
     return
 
 #User commands
-  
-  if message.content.startswith("$moderate"): 
+
+  if message.content.startswith("$moderate"):
     link = "https://docs.google.com/forms/d/e/1FAIpQLSc1gdhWAYWiCxoPXgK9-k-HydFy7iIqif0-a_yvi95H1HCBrQ/viewform?usp=sf_link"
-    msg = "Thank you for your interest in moderation! Below is a link to a Moderator application form. \n" + link
+    msg = "**Thank you for your interest in moderation! Below is a link to a Moderator application form.** \n" + link
     await message.channel.send(msg)
-    logChannel = discord.utils.get(message.guild.text_channels, name="server-logs")
+    logChannel = discord.utils.get(message.guild.text_channels,
+                                   name="server-logs")
     serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
-    await logChannel.send("`{}` has used $moderate! Look out for new form submission! {}".format(message.author, serverOwner.mention))
+    await logChannel.send(
+      "`{}` has used $moderate! Look out for new form submission! {}".format(
+        message.author, serverOwner.mention))
 
   if message.content.startswith('$suggest'):
     author = message.author
     msg = "`{}`: {}".format(author, message.content[8:])
-    suggestionChannel = discord.utils.get(message.guild.channels, name = 'suggestions')
+    suggestionChannel = discord.utils.get(message.guild.channels,
+                                          name='suggestions')
     await suggestionChannel.send(msg)
-    await message.channel.send("**Your suggestion has been sent to a moderator channel. Thank you for your input!**")
-    logChannel = discord.utils.get(message.guild.text_channels, name="server-logs")
+    await message.channel.send(
+      "**Your suggestion has been sent to a moderator channel. Thank you for your input!**"
+    )
+    logChannel = discord.utils.get(message.guild.text_channels,
+                                   name="server-logs")
     serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
-    await logChannel.send("`{}` has used $suggest! Take a peek at #suggestions! {}".format(author, serverOwner.mention))
+    await logChannel.send(
+      "`{}` has used $suggest! Take a peek at #suggestions! {}".format(
+        author, serverOwner.mention))
 
-  
   if (not discord.utils.get(message.author.roles, name="Moderator")) and (
       not message.author.guild_permissions.administrator):
     return
@@ -73,8 +81,7 @@ async def on_message(message):
   if message.content.startswith(
       '$roleMenu') and message.channel.name == "roles":
     await roleMenu(message)
-    
-  
+
   if message.content.startswith('$clearChannel'):
     Author = message.author
     curChannel = message.channel
@@ -133,7 +140,7 @@ async def on_raw_message_delete(payload):
                                      "roles")
   if not payloadInfo:
     return
-  
+
   reactionList = db["reactions"]
   i = 0
   indexList = []
@@ -144,6 +151,7 @@ async def on_raw_message_delete(payload):
   indexList.reverse()
   for i in indexList:
     db["reactions"].pop(i)
+
 
 keep_alive()
 bot.run(TOKEN)
