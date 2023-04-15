@@ -20,6 +20,7 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 @bot.event
 async def on_ready():
   print("ready")
+  print(db["stories"])
   ID = os.environ["SERVER_ID"]
   guild = bot.get_guild(int(ID))
   webhook = discord.utils.get(await guild.webhooks(), id=db["webhook"])
@@ -27,7 +28,7 @@ async def on_ready():
   async def updateNews():
     while True:
       await updateNewsChannel(webhook)
-      await asyncio.sleep(60)
+      await asyncio.sleep(300)
     
   bot.loop.create_task(updateNews())
 
@@ -131,6 +132,5 @@ async def on_raw_message_delete(payload):
   indexList.reverse()
   for i in indexList:
     db["reactions"].pop(i)
-
 
 bot.run(TOKEN)

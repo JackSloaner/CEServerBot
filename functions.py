@@ -198,15 +198,16 @@ async def updateNewsChannel(webhook):
   response = requests.get("https://utoronto.ca/news")
   soup = BeautifulSoup(response.content, 'html.parser')
 
-  latestStory = soup.find_all('div',
-                              {'class': 'pane-latest-news'})[1].find('a')
-
-  linkID = hash(latestStory["href"])
-  if linkID not in db["stories"]:  
-    domain = "https://www.utoronto.ca"
-    embed = createEmbed(latestStory, domain)
-    await webhook.send(embed=embed)
-    db["stories"].pop(0)
-    db["stories"].append(linkID)
-    return
-  print("stories up to date")
+  latestStories = soup.find_all('div',
+                              {'class': 'pane-latest-news'})[1].find_all('a')
+  latestStories.reverse()
+  for story in latestStories:
+    linkID = hash(story["href"])
+    if linkID not in db["stories"]:  
+      domain = "https://www.utoronto.ca"
+      embed = createEmbed(story, domain)
+      await webhook.send(embed=embed)
+      db["stories"].pop(0)
+      db["stories"].append(linkID)
+      continue
+    print("story up to date")
