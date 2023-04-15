@@ -1,3 +1,5 @@
+from keepAlive import keep_alive
+
 import os
 from replit import db
 
@@ -133,4 +135,5 @@ async def on_raw_message_delete(payload):
   for i in indexList:
     db["reactions"].pop(i)
 
+keep_alive()
 bot.run(TOKEN)
