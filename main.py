@@ -20,6 +20,7 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 
 @bot.event
 async def on_ready():
+  db["blackList"] = []
   print("ready")
   ID = os.environ["SERVER_ID"]
   guild = bot.get_guild(int(ID))
@@ -59,6 +60,7 @@ async def on_message(message):
     author = message.author
     print(db["blackList"])
     if author.id in db["blackList"]:
+      await message.channel.send('**Unfortunately you are blackListed from $suggest**')
       return
     msg = "`{}`: {}".format(author, message.content[8:])
     suggestionChannel = discord.utils.get(message.guild.channels,
@@ -97,7 +99,17 @@ async def on_message(message):
     if logChannel:
       await logChannel.send("`{}` has cleared the `#{}` channel".format(
         Author, curChannel))
-
+      
+  if message.content.startswith('$blackList'):
+    args = message.content.strip(" ").split(" ")
+    args = args[1:]
+    print(args)
+    for userDiscrim in args:
+      user = discord.utils.get(message.guild.members, discriminator=userDiscrim)
+      if user:
+        if user.id not in db["blackList"]:
+          db["blackList"].append(user.id)
+          print("successfully blackListed")
 
 @bot.event
 async def on_raw_reaction_add(payload):
