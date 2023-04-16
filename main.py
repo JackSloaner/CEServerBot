@@ -20,7 +20,6 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 
 @bot.event
 async def on_ready():
-  db["blackList"] = []
   print("ready")
   ID = os.environ["SERVER_ID"]
   guild = bot.get_guild(int(ID))
@@ -48,7 +47,7 @@ async def on_message(message):
   if message.content.startswith("$moderate"):
     link = "https://docs.google.com/forms/d/e/1FAIpQLSc1gdhWAYWiCxoPXgK9-k-HydFy7iIqif0-a_yvi95H1HCBrQ/viewform?usp=sf_link"
     msg = "**Thank you for your interest in moderation! Below is a link to a Moderator application form.** \n" + link
-    await message.channel.send(msg)
+    await message.reply(msg)
     logChannel = discord.utils.get(message.guild.text_channels,
                                    name="server-logs")
     serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
@@ -60,13 +59,13 @@ async def on_message(message):
     author = message.author
     print(db["blackList"])
     if author.id in db["blackList"]:
-      await message.channel.send('**Unfortunately you are blackListed from $suggest**')
+      await message.reply('**Unfortunately you are blackListed from $suggest**')
       return
     msg = "`{}`: {}".format(author, message.content[8:])
     suggestionChannel = discord.utils.get(message.guild.channels,
                                           name='suggestions')
     await suggestionChannel.send(msg)
-    await message.channel.send(
+    await message.reply(
       "**Your suggestion has been sent to a moderator channel. Thank you for your input!**"
     )
     logChannel = discord.utils.get(message.guild.text_channels,
@@ -109,7 +108,6 @@ async def on_message(message):
       if user:
         if user.id not in db["blackList"]:
           db["blackList"].append(user.id)
-          print("successfully blackListed")
 
 @bot.event
 async def on_raw_reaction_add(payload):
