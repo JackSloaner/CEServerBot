@@ -57,6 +57,9 @@ async def on_message(message):
 
   if message.content.startswith('$suggest'):
     author = message.author
+    print(db["blackList"])
+    if author.id in db["blackList"]:
+      return
     msg = "`{}`: {}".format(author, message.content[8:])
     suggestionChannel = discord.utils.get(message.guild.channels,
                                           name='suggestions')
