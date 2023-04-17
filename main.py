@@ -24,14 +24,22 @@ async def on_ready():
   ID = os.environ["SERVER_ID"]
   guild = bot.get_guild(int(ID))
 
-  webhook = discord.utils.get(await guild.webhooks(), id=db["webhook"])
+  UofTNews = discord.utils.get(await guild.webhooks(), id=db["webhook"][0])
+  techMemeNews = discord.utils.get(await guild.webhooks(), id=db["webhook"][1])
 
-  async def updateNews():
+  async def updateTMNews():
     while True:
-      await updateNewsChannel(webhook)
+      await updateNewsChannel(techMemeNews)
       await asyncio.sleep(300)
-
-  bot.loop.create_task(updateNews())
+  
+  bot.loop.create_task(updateTMNews())
+  
+  async def updateUTNews():
+    while True:
+      await updateNewsChannel(UofTNews)
+      await asyncio.sleep(300)
+  
+  bot.loop.create_task(updateUTNews())
 
 
 @bot.event

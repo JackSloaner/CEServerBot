@@ -176,8 +176,7 @@ async def roleMenu(message):
     db["reactions"].append(x)
   await message.delete()
 
-def createEmbed(link, domain):
-  domain = "https://www.utoronto.ca"
+def createUTEmbed(link, domain):
   hyperLink = domain + link["href"]
   response = requests.get(hyperLink)
   soup = BeautifulSoup(response.content, 'html.parser')
@@ -194,7 +193,27 @@ def createEmbed(link, domain):
 
   return embed
 
+def createTMEmbed(link, author):
+  embed = Embed(title=link.get_text(), url = link["href"],  colour = 0x0563f8)
+  embed.set_author(name="TechMeme News")
+  embed.set_footer(text="Author: {}".format(author.get_text()), icon_url=author["href"])
+  timezone = pytz.timezone('America/Toronto')
+  now = datetime.now(timezone)
+  hour = now.strftime("%I").strip("0")
+  date_time = now.strftime("%m/%d/%Y • {}:%M %p".format(hour))
+  embed.set_footer(text= date_time)
+
+  return embed
+
 async def updateNewsChannel(webhook):
+  searchInfo = {}
+  if webhook.id == db["webhook"][0]:
+    await updateUTChannel(webhook)
+  if webhook.id == db["webhook"][1]:
+    await updateTMChannel(webhook)
+
+
+async def updateUTChannel(webhook):
   response = requests.get("https://utoronto.ca/news")
   soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -203,11 +222,55 @@ async def updateNewsChannel(webhook):
   latestStories.reverse()
   for story in latestStories:
     linkID = hash(story["href"])
-    if linkID not in db["stories"]:  
+    if linkID not in db["UTstories"]:  
       domain = "https://www.utoronto.ca"
-      embed = createEmbed(story, domain)
+      embed = createUTEmbed(story, domain)
       await webhook.send(embed=embed)
-      db["stories"].pop(0)
-      db["stories"].append(linkID)
+      db["UTstories"].pop(0)
+      db["UTstories"].append(linkID)
+      continue
+    print("story up to date")
+
+
+async def updateTMChannel(webhook):
+  response = requests.get("https://techmeme.com/river")
+  soup = BeautifulSoup(response.content, 'html.parser')
+  
+  latestStories = soup.find_all('table')[1].find_all('a')
+  latestAuthors = soup.find_all('table')[1].find_all('a')
+  i = 3
+  count = len(latestStories) - 1
+  enumStories = range(len(latestStories))
+  for index in enumStories:
+    if i == 3:
+      i = i - 1
+      latestAuthors.pop(count)
+    elif i == 2:
+      latestStories.pop(count)
+      i = i - 1
+    else:
+      
+      latestAuthors.pop(count)
+      latestStories.pop(count)
+      if i:
+        i = i - 1
+      else:
+        i = 3
+    count = count - 1
+
+  if len(latestStories) > 6:
+    latestStories = latestStories[:6]
+    latestAuthors = latestAuthors[:6]
+  latestStories.reverse()
+  latestAuthors.reverse()
+  for x in range(len(latestStories)):
+    link = latestStories[x]
+    author = latestAuthors[x]
+    linkID = hash(link["href"])
+    if linkID not in db["TMstories"]:  
+      embed = createTMEmbed(link, author)
+      await webhook.send(embed=embed)
+      db["TMstories"].pop(0)
+      db["TMstories"].append(linkID)
       continue
     print("story up to date")
