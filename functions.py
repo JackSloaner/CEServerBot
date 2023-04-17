@@ -194,9 +194,8 @@ def createUTEmbed(link, domain):
   return embed
 
 def createTMEmbed(link, author):
-  embed = Embed(title=link.get_text(), url = link["href"],  colour = 0x0563f8)
-  embed.set_author(name="TechMeme News")
-  embed.set_footer(text="Author: {}".format(author.get_text()), icon_url=author["href"])
+  embed = Embed(title=link.get_text(), url = link["href"],  colour = 0x8cbeb6)
+  embed.set_author(name="TechMeme news")
   timezone = pytz.timezone('America/Toronto')
   now = datetime.now(timezone)
   hour = now.strftime("%I").strip("0")
