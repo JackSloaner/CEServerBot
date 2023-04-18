@@ -30,14 +30,14 @@ async def on_ready():
   async def updateTMNews():
     while True:
       await updateNewsChannel(techMemeNews)
-      await asyncio.sleep(300)
+      await asyncio.sleep(240)
   
   bot.loop.create_task(updateTMNews())
   
   async def updateUTNews():
     while True:
       await updateNewsChannel(UofTNews)
-      await asyncio.sleep(300)
+      await asyncio.sleep(240)
   
   bot.loop.create_task(updateUTNews())
 
