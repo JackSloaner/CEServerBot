@@ -238,24 +238,16 @@ async def updateTMChannel(webhook):
   
   latestStories = soup.find_all('table')[1].find_all('a')
   latestAuthors = soup.find_all('table')[1].find_all('a')
-  i = 3
+  i = 1
   count = len(latestStories) - 1
   enumStories = range(len(latestStories))
   for index in enumStories:
-    if i == 3:
+    if i == 1:
       i = i - 1
       latestAuthors.pop(count)
-    elif i == 2:
-      latestStories.pop(count)
-      i = i - 1
     else:
-      
-      latestAuthors.pop(count)
       latestStories.pop(count)
-      if i:
-        i = i - 1
-      else:
-        i = 3
+      i = 1
     count = count - 1
 
   if len(latestStories) > 6:

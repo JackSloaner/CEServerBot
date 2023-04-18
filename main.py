@@ -21,8 +21,6 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 @bot.event
 async def on_ready():
   print("ready")
-  print(db["TMstories"])
-  db["TMstories"] = [0, 0, 0, 0, 0, 0]
   ID = os.environ["SERVER_ID"]
   guild = bot.get_guild(int(ID))
 
