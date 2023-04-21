@@ -176,14 +176,13 @@ async def roleMenu(message):
     db["reactions"].append(x)
   await message.delete()
 
-def createUTEmbed(link, domain):
-  hyperLink = domain + link["href"]
-  response = requests.get(hyperLink)
+def createUTEmbed(link, title, image):
+  link = "https://www.utoronto.ca" + link
+  response = requests.get(link)
   soup = BeautifulSoup(response.content, 'html.parser')
   firstParagraph = soup.find('div', {'class': 'story-content'}).find_all('p')[1].get_text().strip(" ")
-  embed = Embed(title= link["aria-label"], url = hyperLink, description= firstParagraph + "..",  colour = 0x0563f8)
+  embed = Embed(title= title, url = link, description = firstParagraph + "..",  colour = 0x0563f8)
   embed.set_author(name="University of Toronto News")
-  image = (link.find('img')['src'])
   embed.set_image(url=image)
   timezone = pytz.timezone('America/Toronto')
   now = datetime.now(timezone)
@@ -214,17 +213,40 @@ async def updateNewsChannel(webhook):
 
 
 async def updateUTChannel(webhook):
-  response = requests.get("https://utoronto.ca/news")
+  response = requests.get("https://www.utoronto.ca/news/searchnews")
   soup = BeautifulSoup(response.content, 'html.parser')
 
-  latestStories = soup.find_all('div',
-                              {'class': 'pane-latest-news'})[1].find_all('a')
+  allDivs = soup.find('div',
+                              {'class': 'view-content'}).find_all('div')
+  count = 0
+  i = 0
+  latestStories = []
+  latestTitles = []
+  latestImages = []
+  for x in range(len(allDivs)):
+    if i == 0:
+      linkNode = allDivs[x].find('a')
+      latestStories.append(linkNode["href"])
+      latestTitles.append(linkNode.get_text())
+      latestImages.append(linkNode.find('img')["src"])
+    if i == 5:
+      i = 0
+    else:
+      i = i + 1
+  if len(latestStories) > 6:
+    latestStories = latestStories[:6]
+    latestTitles = latestTitles[:6]
+    latestImages = latestImages[:6]
   latestStories.reverse()
-  for story in latestStories:
-    linkID = hash(story["href"])
+  latestTitles.reverse()
+  latestImages.reverse()
+  for storyNum in range(len(latestStories)):
+    link = latestStories[storyNum]
+    title = latestTitles[storyNum]
+    image = latestImages[storyNum]
+    linkID = hash(link)
     if linkID not in db["UTstories"]:  
-      domain = "https://www.utoronto.ca"
-      embed = createUTEmbed(story, domain)
+      embed = createUTEmbed(link, title, image)
       await webhook.send(embed=embed)
       db["UTstories"].pop(0)
       db["UTstories"].append(linkID)
