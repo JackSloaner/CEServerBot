@@ -221,29 +221,31 @@ async def updateUTChannel(webhook):
   count = 0
   i = 0
   latestStories = []
-  latestTitles = []
-  latestImages = []
   for x in range(len(allDivs)):
     if i == 0:
-      linkNode = allDivs[x].find('a')
-      latestStories.append(linkNode["href"])
-      latestTitles.append(linkNode.get_text())
-      latestImages.append(linkNode.find('img')["src"])
+      links = allDivs[x].find_all('a')
+      imageLink = links[0].find('img')
+      if imageLink:
+        imageLink = imageLink["src"]
+      else: 
+        imageLink = 'https://www.utoronto.ca/sites/all/themes/uoft_stark/img/UofT_Centered.svg'
+      story = links[1]
+
+      
+      storyItem = (story["href"], story.get_text(), imageLink)
+      latestStories.append(storyItem)
     if i == 5:
       i = 0
     else:
       i = i + 1
   if len(latestStories) > 6:
     latestStories = latestStories[:6]
-    latestTitles = latestTitles[:6]
-    latestImages = latestImages[:6]
   latestStories.reverse()
-  latestTitles.reverse()
-  latestImages.reverse()
   for storyNum in range(len(latestStories)):
-    link = latestStories[storyNum]
-    title = latestTitles[storyNum]
-    image = latestImages[storyNum]
+    story = latestStories[storyNum]
+    link = story[0]
+    title = story[1]
+    image = story[2]
     linkID = hash(link)
     if linkID not in db["UTstories"]:  
       embed = createUTEmbed(link, title, image)
