@@ -176,11 +176,17 @@ async def on_raw_message_delete(payload):
     db["reactions"].pop(i)
 
 @bot.tree.command(name="introduce", description="Introduce yourself")
-@app_commands.describe(name = "Your Name")
-async def introduce(ctx: discord.Interaction, name: str):
+@app_commands.choices(year = [
+  app_commands.Choice(name = "1st", value="1st"),
+  app_commands.Choice(name = "2nd", value="2nd"),
+  app_commands.Choice(name = "3rd", value="3rd"),
+  app_commands.Choice(name = "4th", value="4th"),
+])
+@app_commands.describe(name = "Your Name", program = "Your Program")
+async def introduce(ctx: discord.Interaction, name: str, program: str, year: app_commands.Choice[str], message: str):
   member = ctx.user
-  embed = createIntroEmbed(member, name)
-  await ctx.channel.send(embed=embed)
+  embed = createIntroEmbed(member, name, program, year, message)
+  await ctx.response.send_message(embed=embed)
 
 keep_alive()
 bot.run(TOKEN)
