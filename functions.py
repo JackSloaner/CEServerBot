@@ -180,7 +180,7 @@ def createUTEmbed(link, title, image):
   link = "https://www.utoronto.ca" + link
   response = requests.get(link)
   soup = BeautifulSoup(response.content, 'html.parser')
-  firstParagraph = soup.find('div', {'class': 'story-content'}).find_all('p')[1].get_text().strip(" ")
+  firstParagraph = soup.find('div', {'class': 'story-content'}).find_all('p')[1].get_text().strip()
   embed = Embed(title= title, url = link, description = firstParagraph + "..",  colour = 0x0563f8)
   embed.set_author(name="University of Toronto News")
   embed.set_image(url=image)

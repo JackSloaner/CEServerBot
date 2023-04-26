@@ -196,6 +196,14 @@ optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 
 [[package]]
+name = "config"
+version = "0.5.1"
+description = "A hierarchical, easy-to-use, powerful configuration module for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "crontab"
 version = "1.0.1"
 description = "Parse and use crontab schedules in Python"
@@ -938,7 +946,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10.0,<3.11"
-content-hash = "e22314c3820a0c29b20c3d8f2c82d73ae0e8505c405307bf1444a6951e3d748c"
+content-hash = "3605090191666d608d38118707a44443822ab3fc6dfe03dcaeb6278b0f6e3a00"
 
 [metadata.files]
 aiohttp = []
@@ -956,6 +964,7 @@ cffi = []
 charset-normalizer = []
 click = []
 colorama = []
+config = []
 crontab = []
 cryptography = []
 debugpy = []
