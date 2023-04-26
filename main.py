@@ -23,13 +23,12 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 @bot.event
 async def on_ready():
   print("ready")
+  guild = bot.get_guild(int(ID))
   try:
     synced = await bot.tree.sync() 
     print("Synced {} command(s)".format(len(synced)))
   except Exception as e:
     print(e)
-    print(e)
-  guild = bot.get_guild(int(ID))
 
   UofTNews = discord.utils.get(await guild.webhooks(), id=db["webhook"][0])
   techMemeNews = discord.utils.get(await guild.webhooks(), id=db["webhook"][1])
@@ -176,10 +175,11 @@ async def on_raw_message_delete(payload):
   for i in indexList:
     db["reactions"].pop(i)
 
-@bot.tree.command(name="introduce")
+@bot.tree.command(name="introduce", description="Introduce yourself")
 @app_commands.describe(name = "Your Name")
-async def introduce(interaction: discord.Interaction, name: str):
-  await interaction.response.send_message("Hello {}".format(name))
+async def introduce(interaction: discord.Interaction, member: discord.Member, name: str):
+  embed = createIntroEmbed(member, name)
+  await interaction.channel.send(embed=embed)
 
 keep_alive()
 bot.run(TOKEN)

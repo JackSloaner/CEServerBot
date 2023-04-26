@@ -10,6 +10,8 @@ import os
 from discord.ext import commands
 from replit import db
 
+# $roleMenu functions
+
 async def getPayloadInfo(guild, payload, channelName):
   if isinstance(payload, discord.RawReactionActionEvent
 ):  
@@ -154,7 +156,6 @@ async def roleMenu(message):
           break
     if role:
       usedRoles.append([roleName, role])
-
   emojis = {}
   with open("emojis.txt") as f:
     rawFile = f.read()
@@ -175,6 +176,8 @@ async def roleMenu(message):
     x.append(botMessage.id)
     db["reactions"].append(x)
   await message.delete()
+
+# Webhook functions
 
 def createUTEmbed(link, title, image):
   link = "https://www.utoronto.ca" + link
@@ -290,3 +293,11 @@ async def updateTMChannel(webhook):
       db["TMstories"].append(linkID)
       continue
     print("story up to date")
+
+# Slash Command functions
+
+def createIntroEmbed(member, name):
+  embed = discord.Embed(title = "Hey, I'm {}!".format(name), description = "{}".format(member), color = )
+  embed.set_thumbnail(url = member.display_avatar.url)
+  return embed
+  
