@@ -177,9 +177,10 @@ async def on_raw_message_delete(payload):
 
 @bot.tree.command(name="introduce", description="Introduce yourself")
 @app_commands.describe(name = "Your Name")
-async def introduce(interaction: discord.Interaction, member: discord.Member, name: str):
+async def introduce(ctx: discord.Interaction, name: str):
+  member = ctx.user
   embed = createIntroEmbed(member, name)
-  await interaction.channel.send(embed=embed)
+  await ctx.channel.send(embed=embed)
 
 keep_alive()
 bot.run(TOKEN)

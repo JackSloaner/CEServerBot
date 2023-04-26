@@ -297,7 +297,7 @@ async def updateTMChannel(webhook):
 # Slash Command functions
 
 def createIntroEmbed(member, name):
-  embed = discord.Embed(title = "Hey, I'm {}!".format(name), description = "{}".format(member), color = )
+  embed = discord.Embed(title = "Hey, I'm {}!".format(name), description = "{}".format(member), color = 0x0563f8)
   embed.set_thumbnail(url = member.display_avatar.url)
   return embed
   
