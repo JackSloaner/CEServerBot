@@ -11,6 +11,8 @@ from discord.ext import commands
 from discord import app_commands
 from discord import Webhook
 from discord.embeds import Embed
+import typing
+from typing import Optional
 
 import schedule
 
@@ -183,7 +185,7 @@ async def on_raw_message_delete(payload):
   app_commands.Choice(name = "4th", value="4th"),
 ])
 @app_commands.describe(name = "Your Name", program = "Your Program")
-async def introduce(ctx: discord.Interaction, name: str, program: str, year: app_commands.Choice[str], message: str):
+async def introduce(ctx: discord.Interaction, name: str, program: str, year: app_commands.Choice[str], message: typing.Optional[str]):
   member = ctx.user
   embed = createIntroEmbed(member, name, program, year, message)
   await ctx.response.send_message(embed=embed)
