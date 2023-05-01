@@ -184,10 +184,37 @@ async def on_raw_message_delete(payload):
   app_commands.Choice(name = "3rd", value="3rd"),
   app_commands.Choice(name = "4th", value="4th"),
 ])
-@app_commands.describe(name = "Your Name", program = "Your Program")
-async def introduce(ctx: discord.Interaction, name: str, program: str, year: app_commands.Choice[str], message: typing.Optional[str]):
+@app_commands.choices(school = [
+  app_commands.Choice(name = "Graduated", value = "Graduated"),
+  app_commands.Choice(name = "Highschool", value = "Highschool"),
+  app_commands.Choice(name = "UofT", value="University of Toronto"),
+  app_commands.Choice(name = "TMU", value="Toronto Metropolitan"),
+  app_commands.Choice(name = "UBC", value="University of British Columbia"),
+  app_commands.Choice(name = "UWaterLoo", value="University of Waterloo"),
+  app_commands.Choice(name = "OttawaU", value="University of Ottawa"),
+  app_commands.Choice(name = "Carleton", value="Carleton University"),
+  app_commands.Choice(name = "QueensU", value="Queen's University"),
+  app_commands.Choice(name = "McGill", value="McGill University"),
+  app_commands.Choice(name = "YorkU", value="York University"),
+  app_commands.Choice(name = "Western", value="Western University"),
+  app_commands.Choice(name = "UGuelph", value="University of Guelph"),
+  app_commands.Choice(name = "Simon Fraser", value="Simon Fraser University"),
+  app_commands.Choice(name = "UCalgary", value="University of Calgary"),
+  app_commands.Choice(name = "UAlberta", value="University of Alberta"),
+    app_commands.Choice(name = "US University", value="US University"),
+  app_commands.Choice(name = "Other (University)", value="Other (University)"),
+  app_commands.Choice(name = "Conestoga", value="Conestoga College"),
+  app_commands.Choice(name = "Centennial", value="Centennial College"),
+  app_commands.Choice(name = "Humber", value="Humber College"),
+  app_commands.Choice(name = "Seneca", value="Seneca College"),
+  app_commands.Choice(name = "George Brown", value="George Brown College"),
+  app_commands.Choice(name = "Other (College)", value="Other (College)"),
+  app_commands.Choice(name = "N/A", value="N/A"),
+])
+@app_commands.describe(name = "Your First Name", program = "Your Program", school = "Your school", year = "Your year of study", interests = "What are your areas of interest?", message = "Write whatever you want about yourself, or anything else!")
+async def introduce(ctx: discord.Interaction, name: str, school: app_commands.Choice[str], program: str, year: app_commands.Choice[str], interests: str, message: typing.Optional[str]):
   member = ctx.user
-  embed = createIntroEmbed(member, name, program, year, message)
+  embed = createIntroEmbed(member, name, school, program, year, interests, message)
   await ctx.response.send_message(embed=embed)
 
 keep_alive()

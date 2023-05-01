@@ -296,11 +296,19 @@ async def updateTMChannel(webhook):
 
 # Slash Command functions
 
-def createIntroEmbed(member, name, program, year, message):
+def createIntroEmbed(member, name, school, program, year, interests, message):
   embed = discord.Embed(title = "Hey, I'm {}!".format(name), description = "{}".format(member), color = 0x0563f8)
   embed.set_thumbnail(url = member.display_avatar.url)
-  embed.add_field(name = "Program:        ", value = program)
-  embed.add_field(name = "Year:        ", value = year.value, inline = True)
-  embed.add_field(name = "", value = message, inline = False)
+  embed.add_field(name = "School:", value = school.value)
+  embed.add_field(name = "Program:", value = program)
+  embed.add_field(name = "Year:", value = year.value, inline = True)
+  embed.add_field(name = "Interests:", value = interests, inline = True)
+  if message:  
+    embed.add_field(name = "Message:", value = message, inline = True)
+  timezone = pytz.timezone('America/Toronto')
+  now = datetime.now(timezone)
+  hour = now.strftime("%I").strip("0")
+  date_time = now.strftime("%m/%d/%Y • {}:%M %p".format(hour))
+  embed.set_footer(text = date_time)
   return embed
   
