@@ -24,8 +24,12 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 
 @bot.event
 async def on_ready():
+  db["introduced"] = {}
   print("ready")
   guild = bot.get_guild(int(ID))
+  for x in guild.members:
+    db["introduced"][int(x.id)] = False
+  print(db["introduced"])
   try:
     synced = await bot.tree.sync() 
     print("Synced {} command(s)".format(len(synced)))
@@ -177,6 +181,10 @@ async def on_raw_message_delete(payload):
   for i in indexList:
     db["reactions"].pop(i)
 
+@bot.event
+async def on_member_join(member):
+  db["introduced"][member.id] = False
+
 @bot.tree.command(name="introduce", description="Introduce yourself")
 @app_commands.choices(year = [
   app_commands.Choice(name = "1st", value="1st"),
@@ -214,9 +222,13 @@ async def on_raw_message_delete(payload):
 @app_commands.describe(name = "Your First Name", program = "Your Program", school = "Your school", year = "Your year of study", interests = "What are your areas of interest?", message = "Write whatever you want about yourself, or anything else!")
 async def introduce(ctx: discord.Interaction, name: str, school: app_commands.Choice[str], program: str, year: app_commands.Choice[str], interests: str, message: typing.Optional[str]):
   member = ctx.user
+  if db["introduced"][str(member.id)]:
+    await ctx.response.send_message("You've already introduced yourself!", ephemeral=True)
+    return
   await ctx.channel.send(ctx.user.mention)
   embed = createIntroEmbed(member, name, school, program, year, interests, message)
   await ctx.response.send_message(embed=embed)
+  db["introduced"][str(member.id)] = True
 
 keep_alive()
 bot.run(TOKEN)
