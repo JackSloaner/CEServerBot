@@ -24,12 +24,8 @@ bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 
 @bot.event
 async def on_ready():
-  db["introduced"] = {}
   print("ready")
   guild = bot.get_guild(int(ID))
-  for x in guild.members:
-    db["introduced"][int(x.id)] = False
-  print(db["introduced"])
   try:
     synced = await bot.tree.sync() 
     print("Synced {} command(s)".format(len(synced)))
@@ -56,6 +52,10 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+  if str(message.channel.id) == os.environ["INTRO_ID"]:
+    if str(message.author.id) != os.environ["BOAT_ID"]:
+      await asyncio.sleep(2)
+      await message.delete()
 
   if message.author == bot.user:
     return
@@ -196,7 +196,7 @@ async def on_member_join(member):
   app_commands.Choice(name = "Graduated", value = "Graduated"),
   app_commands.Choice(name = "Highschool", value = "Highschool"),
   app_commands.Choice(name = "UofT", value="University of Toronto"),
-  app_commands.Choice(name = "TMU", value="Toronto Metropolitan"),
+  app_commands.Choice(name = "TMU", value="Toronto Metropolitan University"),
   app_commands.Choice(name = "UBC", value="University of British Columbia"),
   app_commands.Choice(name = "UWaterLoo", value="University of Waterloo"),
   app_commands.Choice(name = "OttawaU", value="University of Ottawa"),
@@ -225,9 +225,8 @@ async def introduce(ctx: discord.Interaction, name: str, school: app_commands.Ch
   if db["introduced"][str(member.id)]:
     await ctx.response.send_message("You've already introduced yourself!", ephemeral=True)
     return
-  await ctx.channel.send(ctx.user.mention)
   embed = createIntroEmbed(member, name, school, program, year, interests, message)
-  await ctx.response.send_message(embed=embed)
+  await ctx.response.send_message(ctx.user.mention,embed=embed)
   db["introduced"][str(member.id)] = True
 
 keep_alive()
