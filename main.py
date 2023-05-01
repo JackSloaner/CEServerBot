@@ -214,6 +214,7 @@ async def on_raw_message_delete(payload):
 @app_commands.describe(name = "Your First Name", program = "Your Program", school = "Your school", year = "Your year of study", interests = "What are your areas of interest?", message = "Write whatever you want about yourself, or anything else!")
 async def introduce(ctx: discord.Interaction, name: str, school: app_commands.Choice[str], program: str, year: app_commands.Choice[str], interests: str, message: typing.Optional[str]):
   member = ctx.user
+  await ctx.channel.send(ctx.user.mention)
   embed = createIntroEmbed(member, name, school, program, year, interests, message)
   await ctx.response.send_message(embed=embed)
 
