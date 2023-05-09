@@ -112,7 +112,7 @@ async def on_message(message):
     async for message in curChannel.history(limit=200):
       msgs.append(message)
     await curChannel.delete_messages(msgs)
-    logChannel = discord.utils.get(message.guild.text_channels,
+    logChannel = disco4rd.utils.get(message.guild.text_channels,
                                    name="server-logs")
     if logChannel:
       await logChannel.send("`{}` has cleared the `#{}` channel".format(

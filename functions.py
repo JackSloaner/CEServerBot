@@ -244,6 +244,7 @@ async def updateUTChannel(webhook):
   if len(latestStories) > 6:
     latestStories = latestStories[:6]
   latestStories.reverse()
+  popCount = 0
   for storyNum in range(len(latestStories)):
     story = latestStories[storyNum]
     link = story[0]
@@ -253,10 +254,12 @@ async def updateUTChannel(webhook):
     if linkID not in db["UTstories"]:  
       embed = createUTEmbed(link, title, image)
       await webhook.send(embed=embed)
-      db["UTstories"].pop(0)
+      popCount = popCount + 1
       db["UTstories"].append(linkID)
       continue
     print("story up to date")
+  for x in range(popCount):
+    db["UTstories"].pop(0)
 
 
 async def updateTMChannel(webhook):
