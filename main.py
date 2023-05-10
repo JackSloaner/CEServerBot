@@ -163,6 +163,7 @@ async def on_member_join(member):
   db["introduced"][member.id] = False
 
 @bot.tree.command(name="suggest", description="Make a suggestion!")
+@app_commands.checks.cooldown(1, 180.0)
 async def suggest(ctx: discord.Interaction, suggestion: str):
     author = ctx.user
     print(db["blackList"])
@@ -182,7 +183,10 @@ async def suggest(ctx: discord.Interaction, suggestion: str):
     await logChannel.send(
       "`{}` has used /suggest! Take a peek at #suggestions! {}".format(
         author, serverOwner.mention))
-
+@suggest.error
+async def on_suggest_error(ctx: discord.Interaction, error: app_commands.AppCommandError):
+    if isinstance(error, app_commands.CommandOnCooldown):
+        await ctx.response.send_message("**This command is on cooldown, try again in {} Seconds**".format(round(error.retry_after, 2)), ephemeral=True)
 @bot.tree.command(name="moderate", description="Interested in moderation?")
 async def moderate(ctx: discord.Interaction):
   link = "https://docs.google.com/forms/d/e/1FAIpQLSc1gdhWAYWiCxoPXgK9-k-HydFy7iIqif0-a_yvi95H1HCBrQ/viewform?usp=sf_link"
