@@ -61,32 +61,10 @@ async def on_message(message):
     return
   if isinstance(message.author, discord.User):
     return
-
-#User commands
-  if message.content.startswith('$suggest'):
-    author = message.author
-    print(db["blackList"])
-    if author.id in db["blackList"]:
-      await message.reply('**Unfortunately you are blackListed from $suggest**')
-      return
-    msg = "`{}`: {}".format(author, message.content[8:])
-    suggestionChannel = discord.utils.get(message.guild.channels,
-                                          name='suggestions')
-    await suggestionChannel.send(msg)
-    await message.reply(
-      "**Your suggestion has been sent to a moderator channel. Thank you for your input!**"
-    )
-    logChannel = discord.utils.get(message.guild.text_channels,
-                                   name="server-logs")
-    serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
-    await logChannel.send(
-      "`{}` has used $suggest! Take a peek at #suggestions! {}".format(
-        author, serverOwner.mention))
-
+    
   if (not discord.utils.get(message.author.roles, name="Moderator")) and (
       not message.author.guild_permissions.administrator):
     return
-
 #Moderator commands
 
   if message.content.startswith(
@@ -173,17 +151,38 @@ async def on_raw_message_delete(payload):
 async def on_member_join(member):
   db["introduced"][member.id] = False
 
-@bot.tree.command(name="moderate", description="Interested in moderation?")
-async def moderate(ctx: discord.Interaction):
-    link = "https://docs.google.com/forms/d/e/1FAIpQLSc1gdhWAYWiCxoPXgK9-k-HydFy7iIqif0-a_yvi95H1HCBrQ/viewform?usp=sf_link"
-    msg = "**Thank you for your interest in moderation! Below is a link to a Moderator application form.** \n" + link
-    await ctx.response.send_message(msg, ephemeral=True)
+@bot.tree.command(name="suggest", description="Make a suggestion!")
+async def suggest(ctx: discord.Interaction, suggestion: str):
+    author = ctx.user
+    print(db["blackList"])
+    if author.id in db["blackList"]:
+      await ctx.response.send_message('**Unfortunately you are blackListed from /suggest**', ephemeral=True)
+      return
+    msg = "`{}`: {}".format(author, suggestion)
+    suggestionChannel = discord.utils.get(ctx.guild.channels,
+                                          name='suggestions')
+    await suggestionChannel.send(msg)
+    await ctx.response.send_message(
+      "**Your suggestion has been sent to a moderator channel. Thank you for your input!**", ephemeral = True
+    )
     logChannel = discord.utils.get(ctx.guild.text_channels,
                                    name="server-logs")
     serverOwner = discord.utils.get(ctx.guild.members, name="Jack_Sloaner")
     await logChannel.send(
-      "`{}` has used $moderate! Look out for new form submission! {}".format(
-        ctx.user, serverOwner.mention))
+      "`{}` has used /suggest! Take a peek at #suggestions! {}".format(
+        author, serverOwner.mention))
+
+@bot.tree.command(name="moderate", description="Interested in moderation?")
+async def moderate(ctx: discord.Interaction):
+  link = "https://docs.google.com/forms/d/e/1FAIpQLSc1gdhWAYWiCxoPXgK9-k-HydFy7iIqif0-a_yvi95H1HCBrQ/viewform?usp=sf_link"
+  msg = "**Thank you for your interest in moderation! Below is a link to a Moderator application form.** \n" + link
+  await ctx.response.send_message(msg, ephemeral=True)
+  logChannel = discord.utils.get(ctx.guild.text_channels,
+                                   name="server-logs")
+  serverOwner = discord.utils.get(ctx.guild.members, name="Jack_Sloaner")
+  await logChannel.send(
+      "`{}` has used /moderate! Look out for new form submission! {}".format(
+      ctx.user, serverOwner.mention))
     
 
 @bot.tree.command(name="introduce", description="Introduce yourself")
