@@ -93,7 +93,18 @@ async def on_message(message):
       if user:
         if user.id not in db["blackList"]:
           db["blackList"].append(user.id)
-  
+          print("blackListed {}".format(user))
+  if message.content.startswith('$whiteList'):
+    args = message.content.strip(" ").split(" ")
+    args = args[1:]
+    print(args)
+    for userDiscrim in args:
+      user = discord.utils.get(message.guild.members, discriminator=userDiscrim)
+      if user:
+        if user.id in db["blackList"]:
+          db["blackList"].remove(user.id)
+          print("whiteListed {}".format(user))
+    
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -209,7 +220,7 @@ async def moderate(ctx: discord.Interaction):
   app_commands.Choice(name = "Simon Fraser", value="Simon Fraser University"),
   app_commands.Choice(name = "UCalgary", value="University of Calgary"),
   app_commands.Choice(name = "UAlberta", value="University of Alberta"),
-    app_commands.Choice(name = "US University", value="US University"),
+  app_commands.Choice(name = "US University", value="US University"),
   app_commands.Choice(name = "Other (University)", value="Other (University)"),
   app_commands.Choice(name = "Conestoga", value="Conestoga College"),
   app_commands.Choice(name = "Centennial", value="Centennial College"),
