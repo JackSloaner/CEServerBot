@@ -63,18 +63,6 @@ async def on_message(message):
     return
 
 #User commands
-
-  if message.content.startswith("$moderate"):
-    link = "https://docs.google.com/forms/d/e/1FAIpQLSc1gdhWAYWiCxoPXgK9-k-HydFy7iIqif0-a_yvi95H1HCBrQ/viewform?usp=sf_link"
-    msg = "**Thank you for your interest in moderation! Below is a link to a Moderator application form.** \n" + link
-    await message.reply(msg)
-    logChannel = discord.utils.get(message.guild.text_channels,
-                                   name="server-logs")
-    serverOwner = discord.utils.get(message.guild.members, name="Jack_Sloaner")
-    await logChannel.send(
-      "`{}` has used $moderate! Look out for new form submission! {}".format(
-        message.author, serverOwner.mention))
-
   if message.content.startswith('$suggest'):
     author = message.author
     print(db["blackList"])
@@ -184,6 +172,19 @@ async def on_raw_message_delete(payload):
 @bot.event
 async def on_member_join(member):
   db["introduced"][member.id] = False
+
+@bot.tree.command(name="moderate", description="Interested in moderation?")
+async def moderate(ctx: discord.Interaction):
+    link = "https://docs.google.com/forms/d/e/1FAIpQLSc1gdhWAYWiCxoPXgK9-k-HydFy7iIqif0-a_yvi95H1HCBrQ/viewform?usp=sf_link"
+    msg = "**Thank you for your interest in moderation! Below is a link to a Moderator application form.** \n" + link
+    await ctx.response.send_message(msg, ephemeral=True)
+    logChannel = discord.utils.get(ctx.guild.text_channels,
+                                   name="server-logs")
+    serverOwner = discord.utils.get(ctx.guild.members, name="Jack_Sloaner")
+    await logChannel.send(
+      "`{}` has used $moderate! Look out for new form submission! {}".format(
+        ctx.user, serverOwner.mention))
+    
 
 @bot.tree.command(name="introduce", description="Introduce yourself")
 @app_commands.choices(year = [

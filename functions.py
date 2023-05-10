@@ -240,7 +240,7 @@ async def updateUTChannel(webhook):
     if i == 5:
       i = 0
     else:
-      i = i + 1
+      i += 1
   if len(latestStories) > 6:
     latestStories = latestStories[:6]
   latestStories.reverse()
@@ -251,13 +251,15 @@ async def updateUTChannel(webhook):
     title = story[1]
     image = story[2]
     linkID = hash(link)
-    if linkID not in db["UTstories"]:  
+    
+    if linkID not in db["UTstories"]: 
+      print(linkID)
+      print(db["UTstories"])
       embed = createUTEmbed(link, title, image)
       await webhook.send(embed=embed)
-      popCount = popCount + 1
+      popCount += 1
       db["UTstories"].append(linkID)
-      continue
-    print("story up to date")
+      print("New Story: {}".format(title))
   for x in range(popCount):
     db["UTstories"].pop(0)
 
@@ -294,8 +296,8 @@ async def updateTMChannel(webhook):
       await webhook.send(embed=embed)
       db["TMstories"].pop(0)
       db["TMstories"].append(linkID)
-      continue
-    print("story up to date")
+      print("new story")
+
 
 # Slash Command functions
 
