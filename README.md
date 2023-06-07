@@ -1,1 +1,6 @@
-README
+# ECE 2T7 Discord server bot
+## Description
+This is the server-specific discord bot for my UofT graduating class' discord server. Creating this bot allowed me to apply my coding knowledge to something with a real practical use-case. Rather than an arbitrary coding problem where I don't have to worry about specifics, I was forced to be more thorough in the implementation details to deploy a service that wasn't easily abused or broken. In the process of making it, I've learned many invaluable lessons. 
+- First and foremost, I now feel comfortable navigating library documentation, as was learned through the use of `discord.py`, `beautifulSoup4`, and more. 
+- I've expanded my knowledge on web scraping and webhooks by automating news channels that repeatedly pull information from different news sources on the internet.
+- I've learned that I need to organize my code better for my next project. My idea to merely split up event functions and helper functions into two seperate files was insufficient to properly organize my code. This realization came to me when I needed to go back and fix my helper functions. If I could restart this project, one major change I would make would be to organize seperate features into classes (e.g. One class for all role menu creation, one class for all webhooks, where I would implement the "strategy/policy" design pattern to switch between different specific web scraping methods.)
