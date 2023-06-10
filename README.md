@@ -12,4 +12,4 @@ These are the bot's main features:
 - Slash commands: `/introduce` and `/moderate` are the bot's two slash commands. The former lets new members introduce themselves by creating a custom embed that is sent to a intoductions-only channel. The latter sends the user an ephemeral message to a moderation application link. Rather than making commands with the `on_message()` event, slash commands are integrated commands within discord.py, with enhanced usability features.
 
 ## How to use
-This is a server-specific bot, so it only works on the ECE 2T7 server. If you would like to try out the bot, send me a message via linkedin at https://www.linkedin.com/in/jack-sloan-127a95229
+This is a server-specific bot, so it only works on the ECE 2T7 server. If you would like to preview the bot, send me a message via linkedin at https://www.linkedin.com/in/jack-sloan-127a95229 to receive an invite link to the discord server.
