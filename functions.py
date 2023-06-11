@@ -10,29 +10,27 @@ import os
 from discord.ext import commands
 from replit import db
 
-# $roleMenu functions
 
+# $roleMenu functions
 async def getPayloadInfo(guild, payload, channelName):
-  if isinstance(payload, discord.RawReactionActionEvent
-):  
+  if isinstance(payload, discord.RawReactionActionEvent):
     user = discord.utils.get(guild.members, id=payload.user_id)
   else:
     user = 0
   channels = guild.channels
   channel = discord.utils.get(channels, id=payload.channel_id)
   message = 0
-  if isinstance(payload, discord.RawReactionActionEvent
-):
+  if isinstance(payload, discord.RawReactionActionEvent):
     async for x in channel.history(limit=200):
       if x.id == payload.message_id:
         message = x
   soughtChannel = discord.utils.get(channels, name=channelName)
-  payloadInfo = {"channel":channel}
+  payloadInfo = {"channel": channel}
   if user:
     payloadInfo["user"] = user
   if message:
     payloadInfo["message"] = message
-  
+
   if channel == soughtChannel:
     return payloadInfo
   return 0
@@ -85,8 +83,9 @@ def findConfigs(startConfig, final):
       startConfig = nextConfig(startConfig)
       if startConfig == final:
         cfList.append(startConfig)
-      
+
   return cfList
+
 
 def getAllNumberConfigs(length):
   ones = 0
@@ -106,11 +105,13 @@ def getAllNumberConfigs(length):
     ones += 1
   return totalConfigs
 
+
 def dashOrSpace(num):
-  if num: 
+  if num:
     return "-"
   return " "
-  
+
+
 def getAllConfigs(string):
   curDash = string.find("-")
   dashPos = []
@@ -123,8 +124,8 @@ def getAllConfigs(string):
   stringConfigs = []
   for numConfig in numberConfigs:
     if not dashPos:
-        config = string
-        break
+      config = string
+      break
     config = string[0:dashPos[0]]
     i = 0
     for dash in dashPos:
@@ -136,6 +137,7 @@ def getAllConfigs(string):
       i += 1
     stringConfigs.append(config)
   return stringConfigs
+
 
 async def roleMenu(message):
   args = message.content.split(" ")
@@ -177,35 +179,43 @@ async def roleMenu(message):
     db["reactions"].append(x)
   await message.delete()
 
+
 # Webhook functions
 
-def createUTEmbed(link, title, image):
+
+def createUTEmbed(link, title, image, label):
   link = "https://www.utoronto.ca" + link
+  image = "https://www.utoronto.ca" + image
   response = requests.get(link)
   soup = BeautifulSoup(response.content, 'html.parser')
-  firstParagraph = soup.find('div', {'class': 'story-content'}).find_all('p')[1].get_text().strip()
-  embed = Embed(title= title, url = link, description = firstParagraph + "..",  colour = 0x0563f8)
+  firstParagraph = soup.find_all('div', {'class': 'field--name-body'})[1].find('p').get_text().strip()
+  embed = Embed(title=title,
+                url=link,
+                description=firstParagraph + "..",
+                colour=0x0563f8)
   embed.set_author(name="University of Toronto News")
   embed.set_image(url=image)
   timezone = pytz.timezone('America/Toronto')
   now = datetime.now(timezone)
   hour = now.strftime("%I").strip("0")
   date_time = now.strftime("%m/%d/%Y • {}:%M %p".format(hour))
-  embed.set_footer(text= date_time)
+  embed.set_footer(text=date_time)
 
   return embed
 
+
 def createTMEmbed(link, author):
-  embed = Embed(title=link.get_text(), url = link["href"],  colour = 0x8cbeb6)
-  embed.set_author(name=author.get_text(), url = author["href"])
-  embed.add_field(name="TechMeme news", value = "")
+  embed = Embed(title=link.get_text(), url=link["href"], colour=0x8cbeb6)
+  embed.set_author(name=author.get_text(), url=author["href"])
+  embed.add_field(name="TechMeme news", value="")
   timezone = pytz.timezone('America/Toronto')
   now = datetime.now(timezone)
   hour = now.strftime("%I").strip("0")
   date_time = now.strftime("%m/%d/%Y • {}:%M %p".format(hour))
-  embed.set_footer(text= date_time)
+  embed.set_footer(text=date_time)
 
   return embed
+
 
 async def updateNewsChannel(webhook):
   searchInfo = {}
@@ -219,23 +229,25 @@ async def updateUTChannel(webhook):
   response = requests.get("https://www.utoronto.ca/news/searchnews")
   soup = BeautifulSoup(response.content, 'html.parser')
 
-  allDivs = soup.find('div',
-                              {'class': 'view-content'}).find_all('div')
+  allDivs = soup.find('div', {'class': 'view-content'}).find_all('div')
   count = 0
   i = 0
   latestStories = []
-  for x in range(len(allDivs)):
+
+  for x in range(len(allDivs))[2:]:
     if i == 0:
-      links = allDivs[x].find_all('a')
-      imageLink = links[0].find('img')
+      story = allDivs[x + 2].find('a')
+      if not story:
+        i += 1
+        continue
+      label = story["aria-label"]
+      imageLink = allDivs[x].find('img')
       if imageLink:
         imageLink = imageLink["src"]
-      else: 
+      else:
         imageLink = 'https://www.utoronto.ca/sites/all/themes/uoft_stark/img/UofT_Centered.svg'
-      story = links[1]
 
-      
-      storyItem = (story["href"], story.get_text(), imageLink)
+      storyItem = (story["href"], story.get_text(), imageLink, label)
       latestStories.append(storyItem)
     if i == 5:
       i = 0
@@ -250,24 +262,26 @@ async def updateUTChannel(webhook):
     link = story[0]
     title = story[1]
     image = story[2]
+    label = story[3]
     linkID = hash(link)
-    
-    if linkID not in db["UTstories"]: 
+
+    if linkID not in db["UTstories"]:
       print(linkID)
       print(db["UTstories"])
-      embed = createUTEmbed(link, title, image)
+      embed = createUTEmbed(link, title, image, label)
       await webhook.send(embed=embed)
       popCount += 1
       db["UTstories"].append(linkID)
       print("New Story: {}".format(title))
   for x in range(popCount):
+    print("Here\n")
     db["UTstories"].pop(0)
 
 
 async def updateTMChannel(webhook):
   response = requests.get("https://techmeme.com/river")
   soup = BeautifulSoup(response.content, 'html.parser')
-  
+
   latestStories = soup.find_all('table')[1].find_all('a')
   latestAuthors = soup.find_all('table')[1].find_all('a')
   i = 1
@@ -291,7 +305,7 @@ async def updateTMChannel(webhook):
     link = latestStories[x]
     author = latestAuthors[x]
     linkID = hash(link["href"])
-    if linkID not in db["TMstories"]:  
+    if linkID not in db["TMstories"]:
       embed = createTMEmbed(link, author)
       await webhook.send(embed=embed)
       db["TMstories"].pop(0)
@@ -301,19 +315,21 @@ async def updateTMChannel(webhook):
 
 # Slash Command functions
 
+
 def createIntroEmbed(member, name, school, program, year, interests, message):
-  embed = discord.Embed(title = "Hey, I'm {}!".format(name), description = "{}".format(member), color = 0x0563f8)
-  embed.set_thumbnail(url = member.display_avatar.url)
-  embed.add_field(name = "School:", value = school.value)
-  embed.add_field(name = "Program:", value = program)
-  embed.add_field(name = "Year:", value = year.value, inline = True)
-  embed.add_field(name = "Interests:", value = interests, inline = True)
-  if message:  
-    embed.add_field(name = "Message:", value = message, inline = True)
+  embed = discord.Embed(title="Hey, I'm {}!".format(name),
+                        description="{}".format(member),
+                        color=0x0563f8)
+  embed.set_thumbnail(url=member.display_avatar.url)
+  embed.add_field(name="School:", value=school.value)
+  embed.add_field(name="Program:", value=program)
+  embed.add_field(name="Year:", value=year.value, inline=True)
+  embed.add_field(name="Interests:", value=interests, inline=True)
+  if message:
+    embed.add_field(name="Message:", value=message, inline=True)
   timezone = pytz.timezone('America/Toronto')
   now = datetime.now(timezone)
   hour = now.strftime("%I").strip("0")
   date_time = now.strftime("%m/%d/%Y • {}:%M %p".format(hour))
-  embed.set_footer(text = date_time)
+  embed.set_footer(text=date_time)
   return embed
-  

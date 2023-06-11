@@ -27,7 +27,7 @@ async def on_ready():
   print("ready")
   guild = bot.get_guild(int(ID))
   try:
-    synced = await bot.tree.sync() 
+    synced = await bot.tree.sync()
     print("Synced {} command(s)".format(len(synced)))
   except Exception as e:
     print(e)
@@ -39,14 +39,14 @@ async def on_ready():
     while True:
       await updateNewsChannel(techMemeNews)
       await asyncio.sleep(240)
-  
+
   bot.loop.create_task(updateTMNews())
-  
+
   async def updateUTNews():
     while True:
       await updateNewsChannel(UofTNews)
       await asyncio.sleep(240)
-  
+
   bot.loop.create_task(updateUTNews())
 
 
@@ -61,10 +61,12 @@ async def on_message(message):
     return
   if isinstance(message.author, discord.User):
     return
-    
+
   if (not discord.utils.get(message.author.roles, name="Moderator")) and (
       not message.author.guild_permissions.administrator):
     return
+
+
 #Moderator commands
 
   if message.content.startswith(
@@ -79,17 +81,17 @@ async def on_message(message):
       msgs.append(message)
     await curChannel.delete_messages(msgs)
     logChannel = disco4rd.utils.get(message.guild.text_channels,
-                                   name="server-logs")
+                                    name="server-logs")
     if logChannel:
       await logChannel.send("`{}` has cleared the `#{}` channel".format(
         Author, curChannel))
-      
   if message.content.startswith('$blackList'):
     args = message.content.strip(" ").split(" ")
     args = args[1:]
     print(args)
     for userDiscrim in args:
-      user = discord.utils.get(message.guild.members, discriminator=userDiscrim)
+      user = discord.utils.get(message.guild.members,
+                               discriminator=userDiscrim)
       if user:
         if user.id not in db["blackList"]:
           db["blackList"].append(user.id)
@@ -99,12 +101,12 @@ async def on_message(message):
     args = args[1:]
     print(args)
     for userDiscrim in args:
-      user = discord.utils.get(message.guild.members, discriminator=userDiscrim)
+      user = discord.utils.get(message.guild.members,
+                               discriminator=userDiscrim)
       if user:
         if user.id in db["blackList"]:
           db["blackList"].remove(user.id)
           print("whiteListed {}".format(user))
-    
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -120,6 +122,7 @@ async def on_raw_reaction_add(payload):
     if x[1] == reactionEmoji and message == reactedMessage:
       await payloadInfo["user"].add_roles(
         discord.utils.get(message.guild.roles, name=x[0]))
+
 
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -158,91 +161,111 @@ async def on_raw_message_delete(payload):
   for i in indexList:
     db["reactions"].pop(i)
 
+
 @bot.event
 async def on_member_join(member):
   db["introduced"][member.id] = False
 
+
 @bot.tree.command(name="suggest", description="Make a suggestion!")
 @app_commands.checks.cooldown(1, 180.0)
 async def suggest(ctx: discord.Interaction, suggestion: str):
-    author = ctx.user
-    print(db["blackList"])
-    if author.id in db["blackList"]:
-      await ctx.response.send_message('**Unfortunately you are blackListed from /suggest**', ephemeral=True)
-      return
-    msg = "`{}`: {}".format(author, suggestion)
-    suggestionChannel = discord.utils.get(ctx.guild.channels,
-                                          name='suggestions')
-    await suggestionChannel.send(msg)
+  author = ctx.user
+  print(db["blackList"])
+  if author.id in db["blackList"]:
     await ctx.response.send_message(
-      "**Your suggestion has been sent to a moderator channel. Thank you for your input!**", ephemeral = True
-    )
-    logChannel = discord.utils.get(ctx.guild.text_channels,
-                                   name="server-logs")
-    serverOwner = discord.utils.get(ctx.guild.members, name="Jack_Sloaner")
-    await logChannel.send(
-      "`{}` has used /suggest! Take a peek at #suggestions! {}".format(
-        author, serverOwner.mention))
+      '**Unfortunately you are blackListed from /suggest**', ephemeral=True)
+    return
+  msg = "`{}`: {}".format(author, suggestion)
+  suggestionChannel = discord.utils.get(ctx.guild.channels, name='suggestions')
+  await suggestionChannel.send(msg)
+  await ctx.response.send_message(
+    "**Your suggestion has been sent to a moderator channel. Thank you for your input!**",
+    ephemeral=True)
+  logChannel = discord.utils.get(ctx.guild.text_channels, name="server-logs")
+  serverOwner = discord.utils.get(ctx.guild.members, name="Jack_Sloaner")
+  await logChannel.send(
+    "`{}` has used /suggest! Take a peek at #suggestions! {}".format(
+      author, serverOwner.mention))
+
+
 @suggest.error
-async def on_suggest_error(ctx: discord.Interaction, error: app_commands.AppCommandError):
-    if isinstance(error, app_commands.CommandOnCooldown):
-        await ctx.response.send_message("**This command is on cooldown, try again in {} Seconds**".format(round(error.retry_after, 2)), ephemeral=True)
+async def on_suggest_error(ctx: discord.Interaction,
+                           error: app_commands.AppCommandError):
+  if isinstance(error, app_commands.CommandOnCooldown):
+    await ctx.response.send_message(
+      "**This command is on cooldown, try again in {} Seconds**".format(
+        round(error.retry_after, 2)),
+      ephemeral=True)
+
+
 @bot.tree.command(name="moderate", description="Interested in moderation?")
 async def moderate(ctx: discord.Interaction):
   link = "https://docs.google.com/forms/d/e/1FAIpQLSc1gdhWAYWiCxoPXgK9-k-HydFy7iIqif0-a_yvi95H1HCBrQ/viewform?usp=sf_link"
   msg = "**Thank you for your interest in moderation! Below is a link to a Moderator application form.** \n" + link
   await ctx.response.send_message(msg, ephemeral=True)
-  logChannel = discord.utils.get(ctx.guild.text_channels,
-                                   name="server-logs")
+  logChannel = discord.utils.get(ctx.guild.text_channels, name="server-logs")
   serverOwner = discord.utils.get(ctx.guild.members, name="Jack_Sloaner")
   await logChannel.send(
-      "`{}` has used /moderate! Look out for new form submission! {}".format(
+    "`{}` has used /moderate! Look out for new form submission! {}".format(
       ctx.user, serverOwner.mention))
-    
+
 
 @bot.tree.command(name="introduce", description="Introduce yourself")
-@app_commands.choices(year = [
-  app_commands.Choice(name = "1st", value="1st"),
-  app_commands.Choice(name = "2nd", value="2nd"),
-  app_commands.Choice(name = "3rd", value="3rd"),
-  app_commands.Choice(name = "4th", value="4th"),
+@app_commands.choices(year=[
+  app_commands.Choice(name="1st", value="1st"),
+  app_commands.Choice(name="2nd", value="2nd"),
+  app_commands.Choice(name="3rd", value="3rd"),
+  app_commands.Choice(name="4th", value="4th"),
 ])
-@app_commands.choices(school = [
-  app_commands.Choice(name = "Graduated", value = "Graduated"),
-  app_commands.Choice(name = "Highschool", value = "Highschool"),
-  app_commands.Choice(name = "UofT", value="University of Toronto"),
-  app_commands.Choice(name = "TMU", value="Toronto Metropolitan University"),
-  app_commands.Choice(name = "UBC", value="University of British Columbia"),
-  app_commands.Choice(name = "UWaterLoo", value="University of Waterloo"),
-  app_commands.Choice(name = "OttawaU", value="University of Ottawa"),
-  app_commands.Choice(name = "Carleton", value="Carleton University"),
-  app_commands.Choice(name = "QueensU", value="Queen's University"),
-  app_commands.Choice(name = "McGill", value="McGill University"),
-  app_commands.Choice(name = "YorkU", value="York University"),
-  app_commands.Choice(name = "Western", value="Western University"),
-  app_commands.Choice(name = "UGuelph", value="University of Guelph"),
-  app_commands.Choice(name = "Simon Fraser", value="Simon Fraser University"),
-  app_commands.Choice(name = "UCalgary", value="University of Calgary"),
-  app_commands.Choice(name = "UAlberta", value="University of Alberta"),
-  app_commands.Choice(name = "US University", value="US University"),
-  app_commands.Choice(name = "Other (University)", value="Other (University)"),
-  app_commands.Choice(name = "Conestoga", value="Conestoga College"),
-  app_commands.Choice(name = "Centennial", value="Centennial College"),
-  app_commands.Choice(name = "Humber", value="Humber College"),
-  app_commands.Choice(name = "Seneca", value="Seneca College"),
-  app_commands.Choice(name = "George Brown", value="George Brown College"),
-  app_commands.Choice(name = "Other (College)", value="Other (College)"),
-  app_commands.Choice(name = "N/A", value="N/A"),
+@app_commands.choices(school=[
+  app_commands.Choice(name="Graduated", value="Graduated"),
+  app_commands.Choice(name="Highschool", value="Highschool"),
+  app_commands.Choice(name="UofT", value="University of Toronto"),
+  app_commands.Choice(name="TMU", value="Toronto Metropolitan University"),
+  app_commands.Choice(name="UBC", value="University of British Columbia"),
+  app_commands.Choice(name="UWaterLoo", value="University of Waterloo"),
+  app_commands.Choice(name="OttawaU", value="University of Ottawa"),
+  app_commands.Choice(name="Carleton", value="Carleton University"),
+  app_commands.Choice(name="QueensU", value="Queen's University"),
+  app_commands.Choice(name="McGill", value="McGill University"),
+  app_commands.Choice(name="YorkU", value="York University"),
+  app_commands.Choice(name="Western", value="Western University"),
+  app_commands.Choice(name="UGuelph", value="University of Guelph"),
+  app_commands.Choice(name="Simon Fraser", value="Simon Fraser University"),
+  app_commands.Choice(name="UCalgary", value="University of Calgary"),
+  app_commands.Choice(name="UAlberta", value="University of Alberta"),
+  app_commands.Choice(name="US University", value="US University"),
+  app_commands.Choice(name="Other (University)", value="Other (University)"),
+  app_commands.Choice(name="Conestoga", value="Conestoga College"),
+  app_commands.Choice(name="Centennial", value="Centennial College"),
+  app_commands.Choice(name="Humber", value="Humber College"),
+  app_commands.Choice(name="Seneca", value="Seneca College"),
+  app_commands.Choice(name="George Brown", value="George Brown College"),
+  app_commands.Choice(name="Other (College)", value="Other (College)"),
+  app_commands.Choice(name="N/A", value="N/A"),
 ])
-@app_commands.describe(name = "Your First Name", program = "Your Program", school = "Your school", year = "Your year of study", interests = "What are your areas of interest?", message = "Write whatever you want about yourself, or anything else!")
-async def introduce(ctx: discord.Interaction, name: str, school: app_commands.Choice[str], program: str, year: app_commands.Choice[str], interests: str, message: typing.Optional[str]):
+@app_commands.describe(
+  name="Your First Name",
+  program="Your Program",
+  school="Your school",
+  year="Your year of study",
+  interests="What are your areas of interest?",
+  message="Write whatever you want about yourself, or anything else!")
+async def introduce(ctx: discord.Interaction, name: str,
+                    school: app_commands.Choice[str], program: str,
+                    year: app_commands.Choice[str], interests: str,
+                    message: typing.Optional[str]):
   member = ctx.user
   if db["introduced"][str(member.id)]:
-    await ctx.response.send_message("You've already introduced yourself!", ephemeral=True)
+    await ctx.response.send_message("You've already introduced yourself!",
+                                    ephemeral=True)
     return
-  embed = createIntroEmbed(member, name, school, program, year, interests, message)
-  await ctx.response.send_message(ctx.user.mention,embed=embed)
+  embed = createIntroEmbed(member, name, school, program, year, interests,
+                           message)
+  await ctx.response.send_message(ctx.user.mention, embed=embed)
   db["introduced"][str(member.id)] = True
+
 
 keep_alive()
 bot.run(TOKEN)
